@@ -1,0 +1,18 @@
+#container {
+    height: 80vh;
+    overflow: auto;
+    border: 1px solid black;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.resizable-box {
+    border: 1px solid black;
+    box-sizing: content-box;
+    /* or border-box, but be consistent */
+
+}
+
+.circle-shape {
+    border-radius: 50%;
+}

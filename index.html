@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid of Resizable and Draggable Boxes</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+  </style>
+</head>
+
+<body>
+
+  <div id="container">
+    <div id="box-container"></div>
+  </div>
+
+  <button id="create">Create New Box</button>
+  <button id="save">Save</button>
+  <input type="file" id="fileInput" style="display: none;">
+  <button id="load">Load from File</button>
+  <button id="create1x1" class="createBox" data-w="50" data-h="50" data-shape-type="box">1x1 Box</button>
+  <button id="create1x2" class="createBox" data-w="50" data-h="100" data-shape-type="box">1x2 Box</button>
+  <button id="create2x2" class="createBox" data-w="100" data-h="100" data-shape-type="box">2x2 Box</button>
+  <button id="create2x4" class="createBox" data-w="100" data-h="200" data-shape-type="box">2x4 Box</button>
+  <button id="createCircle" class="createBox" data-w="100" data-h="100" data-shape-type="circle">Create Circle</button>
+
+  <pre id="json-output"></pre>
+  <div class="modal" tabindex="-1" role="dialog" id="boxModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Box Dimensions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="boxWidth">Width:</label>
+            <input type="number" class="form-control" id="boxWidth">
+          </div>
+          <div class="form-group">
+            <label for="boxHeight">Height:</label>
+            <input type="number" class="form-control" id="boxHeight">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="confirmBox">Create</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+
+
+
+  </script>
+
+</body>
+
+</html>
