@@ -1,6 +1,37 @@
 $(function () {
   let maxZIndex = 0;
 
+  let currentZoom = 1;
+
+    $('#zoomIn').click(function() {
+        currentZoom += 0.1;
+        $('#box-container').css('transform', 'scale(' + currentZoom + ')');
+    });
+
+    $('#zoomOut').click(function() {
+        currentZoom = Math.max(0.1, currentZoom - 0.1);
+        $('#box-container').css('transform', 'scale(' + currentZoom + ')');
+    });
+    
+  $('#box-container').on('click', '.resizable-box', function () {
+    $('#boxWidth').val($(this).width());
+    $('#boxHeight').val($(this).height());
+    $('#boxColor').val(rgb2hex($(this).css('background-color')));
+    $('#boxGroupId').val($(this).data('group-id'));
+    $('#boxLabel').val($(this).find('.box-label').text()); // Input for editing label name
+    $('#iconOnlyCheck').prop('checked', $(this).hasClass('icon-only')); // Checkbox for icon only
+
+    var icon = $(this).find('i');
+    if (icon.length > 0) {
+      $('#boxIcon').val(icon.attr('class').replace('fa ', ''));
+    } else {
+      $('#boxIcon').val('');
+    }
+
+    $('#confirmBox').data('currentBoxId', $(this).attr('id'));
+    $('#boxModal').modal('show');
+  });
+
   function randomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -10,25 +41,68 @@ $(function () {
     return color;
   }
 
-  function createBox(width, height, shapeType = 'box') {
-    const gap = 0; // No gap as per your previous request
-    const boxNumber = maxZIndex + 1;
+  function createBox(width, height, shapeType, color, groupId, iconClass, iconOnly = false, label = '') {
+    const gap = 1; // Assuming a gap for aesthetics
+    const boxNumber = ++maxZIndex; // Increment the zIndex for each new box
     const rows = Math.floor((boxNumber - 1) / 5);
     const cols = (boxNumber - 1) % 5;
-
-    const topPosition = rows * height;
-    const leftPosition = cols * width;
-
-    const boxLabel = 'Row' + (rows + 1) + '-Col' + (cols + 1);
+  
+    const topPosition = rows * (height + gap);
+    const leftPosition = cols * (width + gap);
+  
+    const boxLabel = label || 'Box ' + boxNumber;
     const circleClass = shapeType === 'circle' ? 'circle-shape' : '';
-
-    const box = $('<div id="box' + boxNumber + '" class="resizable-box ' + circleClass + '" shapetype="' + shapeType + '" data-box_number="' + boxNumber + '" style="background-color: ' + randomColor() + '; position: absolute; top: ' + topPosition + 'px; left: ' + leftPosition + 'px; width: ' + width + 'px; height: ' + height + 'px; z-index: ' + boxNumber + ';">' + boxLabel + '</div>');
-
-    box.appendTo('#box-container').draggable({ containment: "#container" }).resizable();
-    maxZIndex = boxNumber;
+  
+    const box = $('<div/>', {
+      id: 'box' + boxNumber,
+      class: 'resizable-box ' + circleClass + (iconOnly ? ' icon-only' : ''),
+      'data-box_number': boxNumber,
+      'data-group-id': groupId,
+      'data-shape-type': shapeType,
+      css: {
+        position: 'absolute',
+        top: topPosition + 'px',
+        left: leftPosition + 'px',
+        width: width + 'px',
+        height: height + 'px',
+        backgroundColor: color,
+        zIndex: boxNumber
+      }
+    });
+  
+    if (iconOnly && iconClass) {
+      box.append($('<i/>', { class: 'fa ' + iconClass }));
+      box.css({
+        'background-color': 'transparent',
+        'border': 'none'
+      });
+    } else {
+      if (iconClass) {
+        box.append($('<i/>', { class: 'fa ' + iconClass + ' icon' }));
+      }
+      box.append($('<span/>', { class: 'box-label', text: boxLabel }));
+    }
+  
+    box.appendTo('#box-container').draggable({ containment: "#container" }).resizable({
+      // Optional: If you want to maintain aspect ratio while resizing, uncomment below
+      // aspectRatio: true,
+      // Optional: If you want to set the containment within the parent, uncomment below
+      // containment: "parent"
+    });
+  
+    return box;
   }
+  
 
+  function rgb2hex(rgb) {
+    if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
 
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    function hex(x) {
+      return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+  }
 
   function loadBoxesFromJson(data) {
     $('#box-container').empty();
@@ -62,19 +136,57 @@ $(function () {
     $('#boxModal').modal('show');
   });
 
-  $('#confirmBox').click(function () {
-    const width = parseInt($('#boxWidth').val());
-    const height = parseInt($('#boxHeight').val());
-    createBox(width, height);
+  $('#confirmBox').click(function() {
+    var currentBoxId = $(this).data('currentBoxId');
+    var width = $('#boxWidth').val();
+    var height = $('#boxHeight').val();
+    var color = $('#boxColor').val();
+    var groupId = $('#boxGroupId').val();
+    var iconClass = $('#boxIcon').val();
+    var iconOnly = $('#iconOnlyCheck').is(':checked');
+    var label = $('#boxLabel').val();
+
+    if (currentBoxId) {
+      var box = $('#' + currentBoxId);
+      box.empty(); // Clear any previous content
+      box.removeClass('icon-only');
+      if (iconOnly) {
+        box.addClass('icon-only');
+        box.append($('<i/>', { class: 'fa ' + iconClass }));
+        box.css({
+          'background-color': 'transparent',
+          'border': 'none'
+        }).data('group-id', groupId);
+      } else {
+        if (iconClass) {
+          box.prepend($('<i/>', { class: 'fa ' + iconClass }));
+        }
+        box.append($('<span/>', { class: 'box-label', text: label }));
+        box.css({
+          'background-color': color,
+          'border': '' // Reset to default border if needed
+        }).data('group-id', groupId);
+      }
+      box.css({
+        'width': width + 'px',
+        'height': height + 'px'
+      });
+    } else {
+      // Create a new box
+      createBox(parseInt(width), parseInt(height), 'box', color, groupId, iconClass, iconOnly, label);
+    }
+
     $('#boxModal').modal('hide');
+    $('#confirmBox').removeData('currentBoxId');
   });
+
 
   $('.createBox').click(function () {
     const width = $(this).data('w');
     const height = $(this).data('h');
     const shapeType = $(this).data('shape-type'); // Use hyphenated data attributes
 
-    createBox(width, height, shapeType);
+    createBox(width, height, shapeType,randomColor());
   });
 
 
@@ -99,7 +211,10 @@ $(function () {
     $('#json-output').text(JSON.stringify(jsonOutput, null, 2));
   });
 
-
+  $('#clear').click(function () {
+    $('#box-container').empty(); // Clears all boxes from the container
+    maxZIndex = 0; // Reset the zIndex counter if you're using one
+  });
 
 
 
@@ -127,101 +242,7 @@ $(function () {
 
     reader.readAsText(file);
   });
-  let myjson = {
-    "boxes": [
-      {
-        "top": "0px",
-        "left": "0px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 1,
-        "label": "Row1-Col1",
-        "color": "rgb(70, 180, 97)"
-      },
-      {
-        "top": "0px",
-        "left": "100px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 2,
-        "label": "Row1-Col2",
-        "color": "rgb(183, 22, 95)"
-      },
-      {
-        "top": "0px",
-        "left": "200px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 3,
-        "label": "Row1-Col3",
-        "color": "rgb(58, 125, 57)"
-      },
-      {
-        "top": "0px",
-        "left": "300px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 4,
-        "label": "Row1-Col4",
-        "color": "rgb(204, 241, 142)"
-      },
-      {
-        "top": "0px",
-        "left": "400px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 5,
-        "label": "Row1-Col5",
-        "color": "rgb(70, 46, 167)"
-      },
-      {
-        "top": "100px",
-        "left": "0px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 6,
-        "label": "Row2-Col1",
-        "color": "rgb(84, 60, 14)"
-      },
-      {
-        "top": "100px",
-        "left": "100px",
-        "width": "100px",
-        "height": "100px",
-        "zIndex": 7,
-        "label": "Row2-Col2",
-        "color": "rgb(243, 76, 190)"
-      },
-      {
-        "top": "28.8px",
-        "left": "18.8px",
-        "width": "50px",
-        "height": "50px",
-        "zIndex": 8,
-        "label": "Row2-Col3",
-        "color": "rgb(228, 208, 18)"
-      },
-      {
-        "top": "50px",
-        "left": "150px",
-        "width": "50px",
-        "height": "50px",
-        "zIndex": 9,
-        "label": "Row2-Col4",
-        "color": "rgb(53, 233, 80)"
-      },
-      {
-        "top": "0.800003px",
-        "left": "316.8px",
-        "width": "50px",
-        "height": "100px",
-        "zIndex": 10,
-        "label": "Row2-Col5",
-        "color": "rgb(169, 191, 70)"
-      }
-    ]
-  };
 
-  loadBoxesFromJson(myjson);
+  //loadBoxesFromJson(myjson);
 
 });

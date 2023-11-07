@@ -7,6 +7,7 @@
   <title>Grid of Resizable and Draggable Boxes</title>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
   <link rel="stylesheet" href="styles.css">
   <style>
 
@@ -28,29 +29,58 @@
   <button id="create2x2" class="createBox" data-w="100" data-h="100" data-shape-type="box">2x2 Box</button>
   <button id="create2x4" class="createBox" data-w="100" data-h="200" data-shape-type="box">2x4 Box</button>
   <button id="createCircle" class="createBox" data-w="100" data-h="100" data-shape-type="circle">Create Circle</button>
+  <button id="clear">Clear All Boxes</button>
+  <button id="zoomIn">Zoom In</button>
+<button id="zoomOut">Zoom Out</button>
+
 
   <pre id="json-output"></pre>
   <div class="modal" tabindex="-1" role="dialog" id="boxModal">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">New Box Dimensions</h5>
+          <h5 class="modal-title">Edit Box Properties</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="boxWidth">Width:</label>
+            <label for="boxLabel">Label:</label>
+            <input type="text" class="form-control" id="boxLabel" placeholder="Enter label">
+          </div>
+
+          <div class="form-group">
+            <label for="boxWidth">Width (px):</label>
             <input type="number" class="form-control" id="boxWidth">
           </div>
           <div class="form-group">
-            <label for="boxHeight">Height:</label>
+            <label for="boxHeight">Height (px):</label>
             <input type="number" class="form-control" id="boxHeight">
           </div>
+          <div class="form-group">
+            <label for="boxColor">Color:</label>
+            <input type="color" class="form-control" id="boxColor" value="#ff0000"> <!-- Default color set to red -->
+          </div>
+          <div class="form-group">
+            <label for="boxGroupId">Group ID:</label>
+            <input type="text" class="form-control" id="boxGroupId">
+          </div>
+          <div class="form-group">
+            <label for="boxIcon">Font Awesome Icon (e.g., fa-circle)</label>
+            <input type="text" class="form-control" id="boxIcon" placeholder="Enter Font Awesome class">
+          </div>
+          <!-- Add this to your modal content -->
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="iconOnlyCheck">
+            <label class="form-check-label" for="iconOnlyCheck">
+              Icon Only
+            </label>
+          </div>
+
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="confirmBox">Create</button>
+          <button type="button" class="btn btn-primary" id="confirmBox">Save Changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         </div>
       </div>
