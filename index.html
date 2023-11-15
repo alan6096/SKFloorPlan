@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grid of Resizable and Draggable Boxes</title>
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+  <link rel="stylesheet" href="lib/jquery/css/jquery-ui.min.css">
+  <link href="lib/bootstrap4/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="lib/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <style>
 
@@ -16,10 +16,19 @@
 
 <body>
 
+  <!-- Custom Context Menu -->
+<div id="boxContextMenu" class="context-menu">
+  <ul>
+      <li id="editBox">Edit</li>
+      <!-- Add other options here if needed -->
+  </ul>
+</div>
+
   <div id="container">
     <div id="box-container"></div>
   </div>
-
+  <label for="editModeCheck">EditMode</label>
+  <input type="checkbox" id="editModeCheck" checked>
   <button id="create">Create New Box</button>
   <button id="save">Save</button>
   <input type="file" id="fileInput" style="display: none;">
@@ -28,13 +37,17 @@
   <button id="create1x2" class="createBox" data-w="50" data-h="100" data-shape-type="box">1x2 Box</button>
   <button id="create2x2" class="createBox" data-w="100" data-h="100" data-shape-type="box">2x2 Box</button>
   <button id="create2x4" class="createBox" data-w="100" data-h="200" data-shape-type="box">2x4 Box</button>
+  <button id="create100" type="button" class="btn btn-primary">Create 100</button>
   <button id="createCircle" class="createBox" data-w="100" data-h="100" data-shape-type="circle">Create Circle</button>
   <button id="clear">Clear All Boxes</button>
   <button id="zoomIn">Zoom In</button>
-<button id="zoomOut">Zoom Out</button>
+  <button id="zoomOut">Zoom Out</button>
+  <button id="zoomReset">Reset Zoom</button>
+
 
 
   <pre id="json-output"></pre>
+
   <div class="modal" tabindex="-1" role="dialog" id="boxModal">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -49,7 +62,10 @@
             <label for="boxLabel">Label:</label>
             <input type="text" class="form-control" id="boxLabel" placeholder="Enter label">
           </div>
-
+          <div class="form-group">
+            <label for="boxRemarks">Remarks:</label>
+            <textarea class="form-control" id="boxRemarks" placeholder="Enter remarks" rows="5"></textarea>
+          </div>
           <div class="form-group">
             <label for="boxWidth">Width (px):</label>
             <input type="number" class="form-control" id="boxWidth">
@@ -80,6 +96,7 @@
 
         </div>
         <div class="modal-footer">
+          <button id="deleteBox" type="button" class="btn btn-danger">Delete</button>
           <button type="button" class="btn btn-primary" id="confirmBox">Save Changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         </div>
@@ -87,11 +104,28 @@
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Box Info Modal -->
+<div class="modal fade" id="boxInfo" tabindex="-1" aria-labelledby="boxInfoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="boxInfoLabel">Box Label</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="boxRemarksContent">Remarks will go here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script src="lib/jquery/js/jquery.min.js"></script>
+  <script src="lib/jquery/js/jquery-ui.min.js"></script>
+  <script src="lib/popper/popper.min.js"></script>
+  <script src="lib/bootstrap4/js/bootstrap.min.js"></script>
   <script src="script.js"></script>
 
   <script>
